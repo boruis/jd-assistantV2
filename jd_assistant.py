@@ -754,7 +754,7 @@ class Assistant(object):
             except Exception as e:
                 logger.error("某商品在购物车中的信息无法解析，报错信息: %s，该商品自动忽略。 %s", e, item)
 
-        logger.info('购物车信息：%s', cart_detail)
+        logger.info('购物车信息：%s', len(cart_detail))
         return cart_detail
 
     def _cancel_select_all_cart_item(self):

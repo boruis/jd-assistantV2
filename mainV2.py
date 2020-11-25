@@ -48,7 +48,7 @@ def getSystemTimeduration():
 
 
 interval = 0.01  #预约间隔时间
-retry = 15  #重试次数
+retry = 5  #重试次数
 
 
 time_duration = getSystemTimeduration() 
@@ -71,7 +71,11 @@ if __name__ == '__main__':
     #area = '19_1607_4773'  # 区域id
     asst = Assistant()  # 初始化
     sku_id = '100012043978'   #(飞天)
+    # sku_id = '100001324422'   #(Test)
+    # model_type = '2'
     model_type = '1'
+    # area = '1_72_55677'   #area id
+    area = '1_2802_54746'   #area id
     if not model_type:
         model_type = input("请输入购买类型(1.定时预约抢购 2.正常有货购买 3.正常定时购买)：")
     asst.login_by_QRcode()  # 扫码登陆
@@ -109,9 +113,11 @@ if __name__ == '__main__':
         asst.exec_seckill_by_time(sku_ids=sku_id,buy_time=buy_time, retry=retry, interval=interval,num=1)
     elif model_type == '2':
         print("正常有货购买...")
-        sku_ids = input("请输入一个或多个sku_id:")
-        area = input("请输入area_id:")
-        asst.buy_item_in_stock(sku_ids=sku_ids, area=area, wait_all=False, stock_interval=5)
+        if not sku_id:
+            sku_id = input("请输入一个或多个sku_id:")
+        if not area:
+            area = input("请输入area_id:")
+        asst.buy_item_in_stock(sku_ids=sku_id, area=area, wait_all=False, stock_interval=5)
     elif model_type == '3':
         print("正常定时购买...")
         sku_ids = input("请输入一个或多个sku_id:")
