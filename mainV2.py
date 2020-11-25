@@ -15,22 +15,29 @@ if os.name == 'nt':
 """
 python area_id/arget_area_id.py 获取区域ID
 """
-def setSystemTime():
+def getSystemTimeduration():
     url = 'https://a.jd.com//ajax/queryServerData.html'
     session = requests.session()
     # get server time
-    t0 = datetime.datetime.now()
+    t0_s = time.time()
+    t0 = datetime.datetime.fromtimestamp(t0_s) 
     ret = session.get(url).text
-    t1 = datetime.datetime.now()
+    # t1 = datetime.datetime.now()
     t_now = time.time()
+    t1 = datetime.datetime.fromtimestamp(t_now)
     js = json.loads(ret)
     t = float(js["serverTime"]) / 1000
     dt = datetime.datetime.fromtimestamp(t) + ((t1 - t0) / 2)
-    print("jdT:%s Lt:%s dT:%s diff:%s"%(datetime.datetime.fromtimestamp(t),t1,dt,round(t-t_now,2)))
+    nettime = t_now-t0_s
+    time_duration = round(t-t_now,4)
+    countNet = round(time_duration - nettime/2,4)
+    print("t0:%s t1:%s nettime:%0.4f"%(t0,t1,nettime))
+    print("jd:%s dT:%s diff:%s countNet:%0.4f "%(datetime.datetime.fromtimestamp(t),dt,time_duration,countNet))
     tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_wday, tm_yday, tm_isdst = time.gmtime(time.mktime(dt.timetuple()))
     msec = dt.microsecond / 1000
     # if os.name == 'nt':
-    # win32api.SetSystemTime(tm_year, tm_mon, tm_wday, tm_mday, tm_hour, tm_min, tm_sec, int(msec))
+    #     win32api.SetSystemTime(tm_year, tm_mon, tm_wday, tm_mday, tm_hour, tm_min, tm_sec, int(msec))
+    return  round(time_duration - nettime/2,4)
     '''
     ret2=session.get(url).text
     dttime = float(json.loads(ret)["serverTime"]) / 1000
@@ -38,14 +45,22 @@ def setSystemTime():
     tnow = time.time()
     print("jd:%s : %s now:%s  %s diff:%s   "%(dt2,dttime,datetime.datetime.fromtimestamp(tnow),tnow,round(dttime-tnow,2)))
     '''
-# setSystemTime()
 
-from timer import Timer
+
+interval = 0.01  #预约间隔时间
+retry = 15  #重试次数
+
+
+time_duration = getSystemTimeduration() 
+from timer import Timer,getTimeDurationDate
 dt = time.time() 
-buy_time = str(datetime.datetime.fromtimestamp(dt+2))
+buy_time = str(datetime.datetime.fromtimestamp(dt+2-time_duration))
+buy_time1 = getTimeDurationDate(buy_time,time_duration)
+
+# buy_time = str(datetime.datetime.fromtimestamp(dt+2))
 # buy_time = '2020-11-25 13:54:01.0000'
-print("Test now:    %s   buy_time:%s"%(datetime.datetime.fromtimestamp(dt),buy_time))
-t = Timer(buy_time=buy_time)
+print("Test now:    %s   buy_time:%s getTime:%s"%(datetime.datetime.fromtimestamp(dt),buy_time,buy_time1))
+t = Timer(buy_time=buy_time,sleep_interval=interval)
 t.start()
 
 if __name__ == '__main__':
@@ -55,21 +70,27 @@ if __name__ == '__main__':
     """
     #area = '19_1607_4773'  # 区域id
     asst = Assistant()  # 初始化
-    model_type = input("请输入购买类型(1.定时预约抢购 2.正常有货购买 3.正常定时购买)：")
+    sku_id = '100012043978'   #(飞天)
+    model_type = '1'
+    if not model_type:
+        model_type = input("请输入购买类型(1.定时预约抢购 2.正常有货购买 3.正常定时购买)：")
     asst.login_by_QRcode()  # 扫码登陆
     #asst.get_single_item_stock(100006394713,1,'19_1607_4773')
-    # 获取参数信息  100016578654    100009514841
-    interval = 0.1  #预约间隔时间
-    retry = 5  #重试次数
+    # 获取参数信息  100016578654    100009514841   100012043978 (飞天)
+    # 100015521004 (七彩3080)
+
     if model_type == '1':
         print("定时预约抢购...")
-        sku_id = input("请输入一个sku_id:")
+        if not sku_id:
+            sku_id = input("请输入一个sku_id:")
         asst.print_item_info(sku_id)
         reserve_info = asst.get_reserve_info(sku_id)
         reserve_time = reserve_info.get("yueStime")
-        buy_time = reserve_info.get("qiangStime")
+        buy_time_init = reserve_info.get("qiangStime")
+        buy_time = getTimeDurationDate(buy_time_init,time_duration)
+
         print("预约时间:",reserve_time)
-        print("抢购时间:",buy_time)
+        print("抢购时间:%s fix:%s"%(buy_time_init,buy_time))
         # 开始预约
         if reserve_time :
             asst.make_reserve(sku_id, reserve_time + '.000')
@@ -78,7 +99,8 @@ if __name__ == '__main__':
         # 开始抢购
         if buy_time :
             rand_msecond = random.randint(1,9) * 1000
-            buy_time = buy_time + '.000'
+            # buy_time = buy_time + '.000'
+            buy_time = buy_time 
             #buy_time = buy_time + "." + str(rand_msecond)
         else:
             print('获取抢购时间失败')
