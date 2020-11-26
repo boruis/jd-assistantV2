@@ -1157,6 +1157,7 @@ class Assistant(object):
             'Host': 'itemko.jd.com',
             'Referer': 'https://item.jd.com/{}.html'.format(sku_id),
         }
+        retry_times = 10
         while True:
             resp = self.sess.get(url=url, headers=headers, params=payload)
             resp_json = parse_json(resp.text)
@@ -1168,8 +1169,13 @@ class Assistant(object):
                 logger.info("抢购链接获取成功: %s", seckill_url)
                 return seckill_url
             else:
+                retry_times -=1
                 logger.info("抢购链接获取失败，%s不是抢购商品或抢购页面暂未刷新，%s秒后重试",sku_id,self.retryinterval)
-                time.sleep(self.retryinterval)
+                if retry_times > 0:
+                    time.sleep(self.retryinterval)
+                else:
+                    break
+
 
     def request_seckill_url(self, sku_id):
         """访问商品的抢购链接（用于设置cookie等）
@@ -1369,7 +1375,7 @@ class Assistant(object):
         """
         items_dict = parse_sku_id(sku_ids=sku_ids)
         logger.info('准备抢购商品:%s', list(items_dict.keys()))
-
+        
         t = Timer(buy_time=buy_time)
         t.start()
 
