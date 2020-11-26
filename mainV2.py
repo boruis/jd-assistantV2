@@ -13,6 +13,7 @@ import os
 from log import logger
 import socket
 import urllib
+from timer import Timer, getTimeDurationDate,toTimeStamp
 # import sys
 # sys.path.insert(0,'\\Library\\bin')
 # sys.path.append('\\Library\\bin')
@@ -106,7 +107,7 @@ def getSystemTimeduration():
     '''
     ret2=session.get(url).text
     dttime = float(json.loads(ret)["serverTime"]) / 1000
-    dt2 = datetime.datetime.fromtimestamp(dttime)
+    dt2 =   .datetime.fromtimestamp(dttime)
     tnow = time.time()
     print("jd:%s : %s now:%s  %s diff:%s   "%(dt2,dttime,datetime.datetime.fromtimestamp(tnow),tnow,round(dttime-tnow,2)))
     '''
@@ -115,7 +116,7 @@ def getSystemTimeduration():
 time_duration = getRemoteTimeDiff()
 time_duration = getSystemTimeduration()
 
-from timer import Timer, getTimeDurationDate
+
 dt = time.time()
 buy_time = str(datetime.datetime.fromtimestamp(dt + 2 - time_duration))
 buy_time1 = getTimeDurationDate(buy_time, time_duration)
@@ -203,6 +204,8 @@ if __name__ == '__main__':
         if toTimeStamp(buy_time) - time.time() > 100:
             asst.exec_seckill_by_time(
                 sku_ids=sku_id, buy_time=buy_time, retry=retry, interval=loopinterval, num=1)
+        else:
+            logger.info("已过时:buy_time:%s now:%s"%(buy_time,datetime.datetime.now()))
     elif model_type == '2':
         print("正常有货购买...")
         if not sku_id:
