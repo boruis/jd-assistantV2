@@ -57,7 +57,11 @@ class Assistant(object):
 
         if not self.retryinterval:
             self.retryinterval = 0.1
-
+        else:
+            self.retryinterval = int(self.retryinterval)
+        if self.retry:
+            self.retry = int(self.retry)
+            
         self.timeout = float(global_config.get('config', 'timeout') or DEFAULT_TIMEOUT)
         self.send_message = global_config.getboolean('messenger', 'enable')
         self.messenger = Messenger(global_config.get('messenger', 'sckey')) if self.send_message else None
