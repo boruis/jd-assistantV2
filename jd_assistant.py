@@ -45,8 +45,18 @@ class Assistant(object):
         self.fp = global_config.get('config', 'fp')
         self.track_id = global_config.get('config', 'track_id')
         self.risk_control = global_config.get('config', 'risk_control')
+        self.sku_id = global_config.get('item', 'sku_id')
+        self.model_type = global_config.get('item', 'model_type')
+        self.area = global_config.get('item', 'area')
+        self.loopinterval = global_config.get('item', 'loopinterval')
+        self.retry = global_config.get('item', 'retry')
+        self.retryinterval = global_config.get('item', 'retryinterval')
+
         if not self.eid or not self.fp or not self.track_id or not self.risk_control:
             raise AsstException('请在 config.ini 中配置 eid, fp, track_id, risk_control 参数，具体请参考 wiki-常见问题')
+
+        if not self.retryinterval:
+            self.retryinterval = 0.1
 
         self.timeout = float(global_config.get('config', 'timeout') or DEFAULT_TIMEOUT)
         self.send_message = global_config.getboolean('messenger', 'enable')
@@ -1154,8 +1164,8 @@ class Assistant(object):
                 logger.info("抢购链接获取成功: %s", seckill_url)
                 return seckill_url
             else:
-                logger.info("抢购链接获取失败，%s不是抢购商品或抢购页面暂未刷新，0.1秒后重试", sku_id)
-                time.sleep(0.1)
+                logger.info("抢购链接获取失败，%s不是抢购商品或抢购页面暂未刷新，%s秒后重试",sku_id,self.retryinterval)
+                time.sleep(self.retryinterval)
 
     def request_seckill_url(self, sku_id):
         """访问商品的抢购链接（用于设置cookie等）

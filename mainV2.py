@@ -8,6 +8,7 @@ import datetime,json,time
 import os
 if os.name == 'nt':
     import win32api
+from log import logger
 # import sys
 # sys.path.insert(0,'\\Library\\bin')
 # sys.path.append('\\Library\\bin')
@@ -31,8 +32,8 @@ def getSystemTimeduration():
     nettime = t_now-t0_s
     time_duration = round(t-t_now,4)
     countNet = round(time_duration - nettime/2,4)
-    print("t0:%s t1:%s nettime:%0.4f"%(t0,t1,nettime))
-    print("jd:%s dT:%s diff:%s countNet:%0.4f "%(datetime.datetime.fromtimestamp(t),dt,time_duration,countNet))
+    logger.info("t0:%s t1:%s nettime:%0.4f"%(t0,t1,nettime))
+    logger.info("jd:%s dT:%s diff:%s countNet:%0.4f "%(datetime.datetime.fromtimestamp(t),dt,time_duration,countNet))
     tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, tm_wday, tm_yday, tm_isdst = time.gmtime(time.mktime(dt.timetuple()))
     msec = dt.microsecond / 1000
     # if os.name == 'nt':
@@ -47,8 +48,7 @@ def getSystemTimeduration():
     '''
 
 
-interval = 0.01  #预约间隔时间
-retry = 5  #重试次数
+
 
 
 time_duration = getSystemTimeduration() 
@@ -59,8 +59,9 @@ buy_time1 = getTimeDurationDate(buy_time,time_duration)
 
 # buy_time = str(datetime.datetime.fromtimestamp(dt+2))
 # buy_time = '2020-11-25 13:54:01.0000'
-print("Test now:    %s   buy_time:%s getTime:%s"%(datetime.datetime.fromtimestamp(dt),buy_time,buy_time1))
-t = Timer(buy_time=buy_time,sleep_interval=interval)
+
+logger.info("Test now:   %s  buy_time:%s getTime:%s",datetime.datetime.fromtimestamp(dt),buy_time,buy_time1)
+t = Timer(buy_time=buy_time,sleep_interval=0.01)
 t.start()
 
 if __name__ == '__main__':
@@ -70,12 +71,39 @@ if __name__ == '__main__':
     """
     #area = '19_1607_4773'  # 区域id
     asst = Assistant()  # 初始化
-    sku_id = '100012043978'   #(飞天)
+
+    if not asst.sku_id:
+        sku_id = '100012043978'   #(飞天)
+    else:
+        sku_id = asst.sku_id
     # sku_id = '100001324422'   #(Test)
     # model_type = '2'
-    model_type = '1'
+    if not asst.model_type:
+        model_type = '1'
+    else:
+        model_type = asst.model_type
     # area = '1_72_55677'   #area id
-    area = '1_2802_54746'   #area id
+    if not asst.area:
+        area = '1_2802_54746'   #area id
+    else:
+        area = asst.area
+
+    if not asst.loopinterval:
+        loopinterval = 0.01  #预约间隔时间
+    else:
+        loopinterval = asst.loopinterval
+
+    if not asst.retry:
+        retry = 3  #没有抢到,重试次数
+    else:
+        retry = asst.retry  
+    # if not asst.retryinterval:
+    #     retryinterval = 0.05 #链接获取失败,重试间隔
+    # else:
+    #     retryinterval = asst.loopinterval
+
+
+
     if not model_type:
         model_type = input("请输入购买类型(1.定时预约抢购 2.正常有货购买 3.正常定时购买)：")
     asst.login_by_QRcode()  # 扫码登陆
@@ -110,7 +138,7 @@ if __name__ == '__main__':
             print('获取抢购时间失败')
             buy_time = input("请输入抢购时间(2020-03-04 00:59:59.000):")
         #asst.exec_reserve_seckill_by_time(sku_id=sku_id,buy_time=time, retry=10, interval=1,num=1)
-        asst.exec_seckill_by_time(sku_ids=sku_id,buy_time=buy_time, retry=retry, interval=interval,num=1)
+        asst.exec_seckill_by_time(sku_ids=sku_id,buy_time=buy_time, retry=retry, interval=loopinterval,num=1)
     elif model_type == '2':
         print("正常有货购买...")
         if not sku_id:
@@ -124,4 +152,4 @@ if __name__ == '__main__':
         buy_time = input("请输入定时购买时间(2020-03-04 00:59:59.000):")
         asst.clear_cart()       # 清空购物车（可选）
         asst.add_item_to_cart(sku_ids=sku_ids)  # 根据商品id添加购物车（可选）
-        asst.submit_order_by_time(buy_time=buy_time, retry=retry, interval=interval)  # 定时提交订单
+        asst.submit_order_by_time(buy_time=buy_time, retry=retry, interval=loopinterval)  # 定时提交订单
