@@ -8,10 +8,11 @@ python get_area_id.py
 在订单结算页面打开开发者工具，在Console中执行以下 Javascript 代码：
 var eid = $('#eid').val();
 var fp = $('#fp').val();
-var trackId = getTakId();
 var riskControl = $('#riskControl').val();
-console.log(`eid = ${eid}\nfp = ${fp}\ntrack_id = ${trackId}\nrisk_control = ${riskControl}`);
+console.log(`eid = ${eid}\nfp = ${fp}\nrisk_control = ${riskControl}`);
 
+var trackId = getTakId();
+console.log(`eid = ${eid}\nfp = ${fp}\ntrack_id = ${trackId}\nrisk_control = ${riskControl}`);
 https://trade.jd.com/shopping/order/getOrderInfo.action
 http://trade.jd.com/shopping/order/getOrderInfo.action
 get_checkout_page_detail
