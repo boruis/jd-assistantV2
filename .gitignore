@@ -2,6 +2,7 @@ __pycache__/
 .idea/
 cookies/
 build/
+config/
 dist/
 *.pyc
 *.log

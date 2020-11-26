@@ -19,3 +19,4 @@ get_checkout_page_detail
 无法阻止跳转，有一个变相的解决方法：选中开发者工具偏上方的Preserve log，保留跳转前的相关记录。
 chrome://net-internals/#hsts
 输入要http访问的域名然后点击逗delete地按钮即可完成配置。删除的域名不能带有http和https
+

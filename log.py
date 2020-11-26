@@ -2,8 +2,8 @@
 # -*- encoding=utf8 -*-
 import logging
 import logging.handlers
-
-LOG_FILENAME = 'jd-assistant.log'
+import os
+LOG_FILENAME = 'config%sjd-assistant.log'%(os.sep)
 
 logger = logging.getLogger()
 
