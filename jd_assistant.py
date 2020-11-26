@@ -58,7 +58,7 @@ class Assistant(object):
         if not self.retryinterval:
             self.retryinterval = 0.1
         else:
-            self.retryinterval = int(self.retryinterval)
+            self.retryinterval = float(self.retryinterval)
         if self.retry:
             self.retry = int(self.retry)
             
