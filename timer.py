@@ -57,7 +57,7 @@ class Timer(object):
             dt = datetime.fromtimestamp(t0)
             if dt >= self.buy_time:
                 # logger.info('%s时间%s，执行...%s '%(self.buy_time,dt,datetime.now()))
-                logger.info('时间到达%s，开始执行...%0.4f '%(dt,time.time()-self.buy_timeStamp))
+                logger.info('时间到达%s，开始执行...%0.4f log:%0.4f '%(dt,t0-self.buy_timeStamp,time.time()-self.buy_timeStamp))
                 break
             else:
                 time.sleep(self.sleep_interval)

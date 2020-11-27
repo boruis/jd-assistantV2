@@ -70,8 +70,8 @@ def getRemoteTimeDiff():
     print('HTTP data time      = %.4f ms' % (HTTP_data_time))
     print('Data received       = %s bytes' % data_length)
     print('totalSystem         = %.4f ms  All_req:%.4f ms diff:%.4f' % (totalSystem,All_req,totalSystem-All_req))
-    logger.info("jd:%s HTTP_data_time:%s time_duration:%s countNet:%0.4f " % (
-        All_req, HTTP_data_time, time_duration, countNet))
+    logger.info("jd:%.4f HTTP_data_time:%.4f time_duration:%04f countNet:%0.4f " % (
+         All_req, HTTP_data_time, time_duration, countNet))
 
 def getSystemTimeduration():
     # get server time
@@ -195,7 +195,7 @@ if __name__ == '__main__':
         if buy_time:
             rand_msecond = random.randint(1, 9) * 1000
             # buy_time = buy_time + '.000'
-            buy_time = buy_time
+            # buy_time = buy_time
             #buy_time = buy_time + "." + str(rand_msecond)
         else:
             print('获取抢购时间失败')

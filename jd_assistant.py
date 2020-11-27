@@ -46,11 +46,13 @@ class Assistant(object):
         self.track_id = global_config.get('config', 'track_id')
         self.risk_control = global_config.get('config', 'risk_control')
         self.sku_id = global_config.get('item', 'sku_id')
+
         self.model_type = global_config.get('item', 'model_type')
         self.area = global_config.get('item', 'area')
         self.loopinterval = global_config.get('item', 'loopinterval')
         self.retry = global_config.get('item', 'retry')
         self.retryinterval = global_config.get('item', 'retryinterval')
+        self.item_info = dict()
 
         if not self.eid or not self.fp or not self.track_id or not self.risk_control:
             raise AsstException('请在 config.ini 中配置 eid, fp, track_id, risk_control 参数，具体请参考 wiki-常见问题')
@@ -58,7 +60,9 @@ class Assistant(object):
         if not self.retryinterval:
             self.retryinterval = 0.1
         else:
-            self.retryinterval = float(self.retryinterval)
+            self.retryinterval = float(self.retryinterval) #config.ini
+            # self.retryinterval = 0.1
+
         if self.retry:
             self.retry = int(self.retry)
             
@@ -422,6 +426,8 @@ class Assistant(object):
             logger.info(reserve_result)
         else:
             logger.info("预约失败时间已过或者JD修改了返回结构")
+            if self.send_message:
+                self.messenger.send(text='%s需检查cookies'%(self.item_info.get('name')[:20]), desp='预约失败时间已过或者JD修改了返回结构,预约商品：%s'%(sku_id))
 
     @check_login
     def get_user_info(self):
@@ -663,9 +669,10 @@ class Assistant(object):
         return {'name':name,'price':price}
     
     def print_item_info(self, sku_id):
-        item_info = self.get_item_info(sku_id)
-        print("商品名称:",item_info.get('name'))
-        print("商品价格:",item_info.get('price'))
+        self.item_info = self.get_item_info(sku_id)
+
+        print("商品名称:",self.item_info.get('name'))
+        print("商品价格:",self.item_info.get('price'))
 
 
     @check_login
@@ -1157,7 +1164,7 @@ class Assistant(object):
             'Host': 'itemko.jd.com',
             'Referer': 'https://item.jd.com/{}.html'.format(sku_id),
         }
-        retry_times = 10
+        retry_time = 10
         while True:
             resp = self.sess.get(url=url, headers=headers, params=payload)
             resp_json = parse_json(resp.text)
@@ -1169,12 +1176,12 @@ class Assistant(object):
                 logger.info("抢购链接获取成功: %s", seckill_url)
                 return seckill_url
             else:
-                retry_times -=1
-                logger.info("抢购链接获取失败，%s不是抢购商品或抢购页面暂未刷新，%s秒后重试",sku_id,self.retryinterval)
-                if retry_times > 0:
+                retry_time -=1
+                logger.info("抢购链接获取失败，%s 不是抢购商品或抢购页面暂未刷新，%s秒后重试\n url:%s  resp_json:%s ",sku_id,self.retryinterval,url,resp_json)
+                if retry_time > 0:
                     time.sleep(self.retryinterval)
                 else:
-                    break
+                    return False
 
 
     def request_seckill_url(self, sku_id):
@@ -1183,13 +1190,17 @@ class Assistant(object):
         :return:
         """
         if not self.seckill_url.get(sku_id):
+            #获取抢购链接
             self.seckill_url[sku_id] = self._get_seckill_url(sku_id)
         headers = {
             'User-Agent': self.user_agent,
             'Host': 'marathon.jd.com',
             'Referer': 'https://item.jd.com/{}.html'.format(sku_id),
         }
-        self.sess.get(url=self.seckill_url.get(sku_id), headers=headers, allow_redirects=False)
+        if self.seckill_url.get(sku_id):
+            self.sess.get(url=self.seckill_url.get(sku_id), headers=headers, allow_redirects=False)
+        else:
+            logger.info('抢购链接获取失败:%s'%(self.seckill_url.get(sku_id)))
 
     def request_seckill_checkout_page(self, sku_id, num=1):
         """访问抢购订单结算页面
@@ -1252,6 +1263,7 @@ class Assistant(object):
         default_address = init_info['addressList'][0]  # 默认地址dict
         invoice_info = init_info.get('invoiceInfo', {})  # 默认发票信息dict, 有可能不返回
         token = init_info['token']
+        logger.info("addressList:%s token:%s"%(default_address,token))
 
         data = {
             'skuId': sku_id,
@@ -1324,7 +1336,7 @@ class Assistant(object):
             pay_url = 'https:' + resp_json.get('pcUrl')
             logger.info('抢购成功，订单号: %s, 总价: %s, 电脑端付款链接: %s', order_id, total_money, pay_url)
             if self.send_message:
-                self.messenger.send(text='jd-assistant 订单抢购成功', desp='订单号：%s' % order_id)
+                self.messenger.send(text='%s订单抢购成功', desp='订单号：%s' % (self.item_info.get('name'),order_id))
             return True
         else:
             logger.info('抢购失败，返回信息: %s', resp_json)
@@ -1347,12 +1359,13 @@ class Assistant(object):
         for count in range(1, retry + 1):
             logger.info('第[%s/%s]次尝试抢购商品:%s', count, retry, sku_id)
             self.request_seckill_url(sku_id)
-            self.request_seckill_checkout_page(sku_id, num)
-            if self.submit_seckill_order(sku_id, num):
-                return True
-            else:
-                logger.info('休息%ss', interval)
-                time.sleep(interval)
+            if self.seckill_url.get(sku_id):
+                self.request_seckill_checkout_page(sku_id, num)
+                if self.submit_seckill_order(sku_id, num):
+                    return True
+                else:
+                    logger.info('休息%ss', interval)
+                    time.sleep(interval)
         else:
             logger.info('执行结束，抢购%s失败！', sku_id)
             return False
