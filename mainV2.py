@@ -103,7 +103,7 @@ def getSystemTimeduration():
     # if os.name == 'nt':
     #     win32api.SetSystemTime(tm_year, tm_mon, tm_wday, tm_mday, tm_hour, tm_min, tm_sec, int(msec))
 
-    return countNet
+    return time_duration
     '''
     ret2=session.get(url).text
     dttime = float(json.loads(ret)["serverTime"]) / 1000
