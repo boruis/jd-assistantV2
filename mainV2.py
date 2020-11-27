@@ -113,7 +113,7 @@ def getSystemTimeduration():
     '''
 
 
-time_duration = getRemoteTimeDiff()
+getRemoteTimeDiff()
 time_duration = getSystemTimeduration()
 
 
