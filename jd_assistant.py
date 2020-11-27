@@ -1003,7 +1003,7 @@ class Assistant(object):
                 order_id = resp_json.get('orderId')
                 logger.info('订单提交成功! 订单号：%s', order_id)
                 if self.send_message:
-                    self.messenger.send(text='jd-assistant 订单提交成功', desp='订单号：%s' % order_id)
+                    self.messenger.send(text='%s订单提交成功' % (self.item_info.get('name')[:20]), desp='订单号：%s' % order_id)
                 return True
             else:
                 message, result_code = resp_json.get('message'), resp_json.get('resultCode')
@@ -1336,7 +1336,7 @@ class Assistant(object):
             pay_url = 'https:' + resp_json.get('pcUrl')
             logger.info('抢购成功，订单号: %s, 总价: %s, 电脑端付款链接: %s', order_id, total_money, pay_url)
             if self.send_message:
-                self.messenger.send(text='%s订单抢购成功', desp='订单号：%s' % (self.item_info.get('name'),order_id))
+                self.messenger.send(text='%s订单抢购成功' %(self.item_info.get('name')[:20]), desp='订单号：%s' % (order_id))
             return True
         else:
             logger.info('抢购失败，返回信息: %s', resp_json)
