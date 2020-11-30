@@ -154,7 +154,7 @@ if __name__ == '__main__':
         area = asst.area
 
     if not asst.loopinterval:
-        loopinterval = 0.01  # 预约间隔时间
+        loopinterval = 0.1  # 预约间隔时间
     else:
         loopinterval = asst.loopinterval
 
@@ -184,6 +184,7 @@ if __name__ == '__main__':
         reserve_info = asst.get_reserve_info(sku_id)
         reserve_time = reserve_info.get("yueStime")
         buy_time_init = reserve_info.get("qiangStime")
+        logger.info("buy_time:%s"%(buy_time_init))
         buy_time = getTimeDurationDate(buy_time_init, time_duration)
 
         print("预约时间:", reserve_time)
@@ -194,7 +195,7 @@ if __name__ == '__main__':
         else:
             print('获取预约时间失败')
         # 开始抢购
-        if buy_time:
+        if buy_time is not None:
             rand_msecond = random.randint(1, 9) * 1000
             # buy_time = buy_time + '.000'
             # buy_time = buy_time

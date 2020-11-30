@@ -27,8 +27,11 @@ def toTimeStamp(timeString):
 
 def getTimeDurationDate(timeString,Duration):
     #抢购时间修正为主机时间
-    dT =  toTimeStamp(timeString) - Duration
-    return str(datetime.fromtimestamp(dT))
+    if timeString is not None:
+        dT =  toTimeStamp(timeString) - Duration
+        return str(datetime.fromtimestamp(dT))
+    else:
+        return timeString
 # timeStamp to timeString
 # 时间戳转时间字符串
 def toTimeString(timeStamp):
