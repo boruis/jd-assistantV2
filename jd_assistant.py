@@ -1192,13 +1192,17 @@ class Assistant(object):
         if not self.seckill_url.get(sku_id):
             #获取抢购链接
             self.seckill_url[sku_id] = self._get_seckill_url(sku_id)
-        headers = {
+            headers = {
             'User-Agent': self.user_agent,
             'Host': 'marathon.jd.com',
             'Referer': 'https://item.jd.com/{}.html'.format(sku_id),
-        }
+            }
+        else:
+            logger.info('已有抢购链接:%s'%(self.seckill_url.get(sku_id)))
+
         if self.seckill_url.get(sku_id):
-            self.sess.get(url=self.seckill_url.get(sku_id), headers=headers, allow_redirects=False)
+            resp = self.sess.get(url=self.seckill_url.get(sku_id), headers=headers, allow_redirects=False)
+            logger.info('抢购链接resp:%s'%(resp.text))
         else:
             logger.info('抢购链接获取失败:%s'%(self.seckill_url.get(sku_id)))
 
@@ -1219,7 +1223,8 @@ class Assistant(object):
             'Host': 'marathon.jd.com',
             'Referer': 'https://item.jd.com/{}.html'.format(sku_id),
         }
-        self.sess.get(url=url, params=payload, headers=headers)
+        resp = self.sess.get(url=url, params=payload, headers=headers)
+        logger.info('已有抢购checkout_page:%s'%(resp.text))
 
     def _get_seckill_init_info(self, sku_id, num=1):
         """获取秒杀初始化信息（包括：地址，发票，token）
@@ -1395,6 +1400,7 @@ class Assistant(object):
         for sku_id in items_dict:
             logger.info('开始抢购商品:%s', sku_id)
             self.exec_seckill(sku_id, retry, interval, num)
+            logger.info('结束抢购商品:%s', sku_id)
 
     @check_login
     def exec_reserve_seckill_by_time(self, sku_id, buy_time, retry=4, interval=4, num=1):
