@@ -178,6 +178,8 @@ if __name__ == '__main__':
         print("定时预约抢购...")
         if not sku_id:
             sku_id = input("请输入一个sku_id:")
+        else:
+            logger.info("定时预约sku_id:%s"%(sku_id))
         asst.print_item_info(sku_id)
         reserve_info = asst.get_reserve_info(sku_id)
         reserve_time = reserve_info.get("yueStime")
