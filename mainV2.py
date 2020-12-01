@@ -149,7 +149,8 @@ if __name__ == '__main__':
         model_type = asst.model_type
     # area = '1_72_55677'   #area id
     if not asst.area:
-        area = '1_2802_54746'  # area id
+        area = '1_72_55677'  # area id
+        # area = '1_2802_54746'  # area id
     else:
         area = asst.area
 
@@ -166,7 +167,7 @@ if __name__ == '__main__':
     #     retryinterval = 0.05 #链接获取失败,重试间隔
     # else:
     #     retryinterval = asst.loopinterval
-
+    
     if not model_type:
         model_type = input("请输入购买类型(1.定时预约抢购 2.正常有货购买 3.正常定时购买)：")
     asst.login_by_QRcode()  # 扫码登陆

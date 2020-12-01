@@ -63,6 +63,11 @@ class Assistant(object):
             self.retryinterval = float(self.retryinterval) #config.ini
             # self.retryinterval = 0.1
 
+        if not self.loopinterval:
+            self.loopinterval = 0.1
+        else:
+            self.loopinterval = float(self.loopinterval) #config.ini
+
         if self.retry:
             self.retry = int(self.retry)
             
@@ -515,7 +520,9 @@ class Assistant(object):
         :return: 响应
         """
         url = 'https://item.jd.com/{}.html'.format(sku_id)
+        # logger.info("item_detai:%s"%(url))
         page = requests.get(url=url, headers=self.headers)
+        # logger.info("page:%s"%(page.text))
         return page
 
     def get_single_item_stock(self, sku_id, num, area):
