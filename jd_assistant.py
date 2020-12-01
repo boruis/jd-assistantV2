@@ -120,7 +120,6 @@ class Assistant(object):
         for name, value in cookies:
             cookie += '{0}={1};'.format(name, value)
         return cookie
-
     def _validate_cookies(self):
         """验证cookies是否有效（是否登陆）
         通过访问用户订单列表页进行判断：若未登录，将会重定向到登陆页面。
@@ -135,15 +134,23 @@ class Assistant(object):
         # headers = {
         #     "cookie": cookie
         # }
+        headers = {
+            'User-Agent': self.user_agent,
+        }
+
         try:
 
-            resp = self.sess.get(url=url, params=payload, allow_redirects=False)
-            # resp = self.sess.get(url=url, params=payload,  headers=headers,allow_redirects=False)
-            # soup = BeautifulSoup(resp.text, "html.parser")
+            # resp = self.sess.get(url=url, params=payload, allow_redirects=False)
+            resp = self.sess.get(url=url, params=payload,  headers=headers,allow_redirects=False)
+            soup = BeautifulSoup(resp.text, "html.parser")
+            # validate_title = soup.title.string if soup.title is not None else None
             # name = get_tag_value(soup.select("div.sku-name"))
-            logger.info("response_status(resp):%s validate_cookies:%s "%(response_status(resp),resp.text[:150]))
-            if resp.status_code == requests.codes.OK:
-                return True
+            if soup.title is not None:
+                if resp.status_code == requests.codes.OK:
+                    return True
+            else:
+                logger.info("status:%s validate:%s "%(response_status(resp),resp.text[:150]))
+                return False
         except Exception as e:
             logger.error(e)
 
@@ -193,36 +200,36 @@ class Assistant(object):
         open_image(image_file)
         return input('验证码:')
 
-    def _validate_cookies_johnson(self):
-        """验证cookies是否有效（是否登陆）
-        通过访问用户订单列表页进行判断：若未登录，将会重定向到登陆页面。
-        :return: cookies是否有效 True/False
-        """
-        url = 'https://order.jd.com/center/list.action'
-        payload = {
-            'rid': str(int(time.time() * 1000)),
-        }
-        resp = self.sess.get(url=url, params=payload, allow_redirects=True)
+    # def _validate_cookies_johnson(self):
+    #     """验证cookies是否有效（是否登陆）
+    #     通过访问用户订单列表页进行判断：若未登录，将会重定向到登陆页面。
+    #     :return: cookies是否有效 True/False
+    #     """
+    #     url = 'https://order.jd.com/center/list.action'
+    #     payload = {
+    #         'rid': str(int(time.time() * 1000)),
+    #     }
+    #     resp = self.sess.get(url=url, params=payload, allow_redirects=True)
 
-        # cookie = self._get_cookies_items()
-        # headers = {
-        #     "cookie": cookie
-        # }
-        url = 'https://passport.jd.com/uc/login?ReturnUrl=http%3A%2F%2Forder.jd.com%2Fcenter%2Flist.action'
-        try:
+    #     # cookie = self._get_cookies_items()
+    #     # headers = {
+    #     #     "cookie": cookie
+    #     # }
+    #     url = 'https://passport.jd.com/uc/login?ReturnUrl=http%3A%2F%2Forder.jd.com%2Fcenter%2Flist.action'
+    #     try:
 
-            resp = self.sess.get(url=url, params=payload, allow_redirects=True)
-            # resp = self.sess.get(url=url, params=payload,  headers=headers,allow_redirects=False)
-            # soup = BeautifulSoup(resp.text, "html.parser")
-            # name = get_tag_value(soup.select("div.sku-name"))
-            logger.info("response_status(resp):%s validate_cookies:%s "%(response_status(resp),resp.text[:150]))
-            if resp.status_code == requests.codes.OK:
-                return resp
-        except Exception as e:
-            logger.error(e)
+    #         resp = self.sess.get(url=url, params=payload, allow_redirects=True)
+    #         # resp = self.sess.get(url=url, params=payload,  headers=headers,allow_redirects=False)
+    #         # soup = BeautifulSoup(resp.text, "html.parser")
+    #         # name = get_tag_value(soup.select("div.sku-name"))
+    #         logger.info("response_status(resp):%s validate_cookies:%s "%(response_status(resp),resp.text[:150]))
+    #         if resp.status_code == requests.codes.OK:
+    #             return resp
+    #     except Exception as e:
+    #         logger.error(e)
 
-        self.sess = requests.session()
-        return False
+    #     self.sess = requests.session()
+    #     return False
 
     def _get_login_page(self):
         # page = self._validate_cookies_johnson()
@@ -522,7 +529,7 @@ class Assistant(object):
         url = 'https://item.jd.com/{}.html'.format(sku_id)
         # logger.info("item_detai:%s"%(url))
         page = requests.get(url=url, headers=self.headers)
-        # logger.info("page:%s"%(page.text))
+        logger.debug("page:%s"%(page.text[:150]))
         return page
 
     def get_single_item_stock(self, sku_id, num, area):
