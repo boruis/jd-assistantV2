@@ -106,7 +106,6 @@ class Assistant(object):
 
     def _save_cookies(self):
         self.local_cookies = self.sess.cookies
-        # self._validate_cookies()
         cookies_file = './config/{0}.cookies'.format(self.nick_name)
         directory = os.path.dirname(cookies_file)
         if not os.path.exists(directory):
@@ -120,6 +119,7 @@ class Assistant(object):
         for name, value in cookies:
             cookie += '{0}={1};'.format(name, value)
         return cookie
+
     def _validate_cookies(self):
         """验证cookies是否有效（是否登陆）
         通过访问用户订单列表页进行判断：若未登录，将会重定向到登陆页面。
@@ -200,42 +200,8 @@ class Assistant(object):
         open_image(image_file)
         return input('验证码:')
 
-    # def _validate_cookies_johnson(self):
-    #     """验证cookies是否有效（是否登陆）
-    #     通过访问用户订单列表页进行判断：若未登录，将会重定向到登陆页面。
-    #     :return: cookies是否有效 True/False
-    #     """
-    #     url = 'https://order.jd.com/center/list.action'
-    #     payload = {
-    #         'rid': str(int(time.time() * 1000)),
-    #     }
-    #     resp = self.sess.get(url=url, params=payload, allow_redirects=True)
-
-    #     # cookie = self._get_cookies_items()
-    #     # headers = {
-    #     #     "cookie": cookie
-    #     # }
-    #     url = 'https://passport.jd.com/uc/login?ReturnUrl=http%3A%2F%2Forder.jd.com%2Fcenter%2Flist.action'
-    #     try:
-
-    #         resp = self.sess.get(url=url, params=payload, allow_redirects=True)
-    #         # resp = self.sess.get(url=url, params=payload,  headers=headers,allow_redirects=False)
-    #         # soup = BeautifulSoup(resp.text, "html.parser")
-    #         # name = get_tag_value(soup.select("div.sku-name"))
-    #         logger.info("response_status(resp):%s validate_cookies:%s "%(response_status(resp),resp.text[:150]))
-    #         if resp.status_code == requests.codes.OK:
-    #             return resp
-    #     except Exception as e:
-    #         logger.error(e)
-
-    #     self.sess = requests.session()
-    #     return False
 
     def _get_login_page(self):
-        # page = self._validate_cookies_johnson()
-
-
-
         url = "https://passport.jd.com/new/login.aspx"
         page = self.sess.get(url, headers=self.headers)
         return page
