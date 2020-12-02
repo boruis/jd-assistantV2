@@ -149,7 +149,7 @@ class Assistant(object):
                 if resp.status_code == requests.codes.OK:
                     return True
             else:
-                logger.info("status:%s validate:%s "%(response_status(resp),resp.text[:150]))
+                logger.error("status:%s validate:%s "%(response_status(resp),resp.text[:150]))
                 return False
         except Exception as e:
             logger.error(e)
