@@ -1306,7 +1306,7 @@ class Assistant(object):
         default_address = init_info['addressList'][0]  # 默认地址dict
         invoice_info = init_info.get('invoiceInfo', {})  # 默认发票信息dict, 有可能不返回
         token = init_info['token']
-        logger.info("addressList:%s token:%s"%(default_address,token))
+        # logger.info("addressList:%s token:%s"%(default_address,token))
 
         data = {
             'skuId': sku_id,
