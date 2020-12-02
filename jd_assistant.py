@@ -345,7 +345,7 @@ class Assistant(object):
         resp_json = parse_json(resp.text)
 
         if resp_json['code'] != 200:
-            logger.info('Code: %s, Message: %s ,resp:%s', resp_json['code'], resp_json['msg'],resp.text)
+            logger.info('Code: %s, Message: %s', resp_json['code'], resp_json['msg'])
             return None
         else:
             logger.info('已完成手机客户端确认')
