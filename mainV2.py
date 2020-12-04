@@ -120,12 +120,13 @@ time_duration = getSystemTimeduration()
 dt = time.time()
 buy_time = str(datetime.datetime.fromtimestamp(dt + 2 - time_duration))
 buy_time1 = getTimeDurationDate(buy_time, time_duration)
+# buy_time1 = getTimeDurationDate(buy_time, -1.0)
 
 # buy_time = str(datetime.datetime.fromtimestamp(dt+2))
 # buy_time = '2020-11-25 13:54:01.0000'
 
-logger.info("Test now:   %s  buy_time:%s getTime:%s",
-            datetime.datetime.fromtimestamp(dt), buy_time, buy_time1)
+logger.info("Test now:   %s  buy_time:%s time_duration:%s fixTime:%s",
+            datetime.datetime.fromtimestamp(dt), buy_time, time_duration,buy_time1)
 t = Timer(buy_time=buy_time, sleep_interval=0.01)
 t.start()
 
@@ -186,7 +187,10 @@ if __name__ == '__main__':
         reserve_time = reserve_info.get("yueStime")
         buy_time_init = reserve_info.get("qiangStime")
         logger.info("buy_time:%s"%(buy_time_init))
-        buy_time = getTimeDurationDate(buy_time_init, time_duration)
+        if sku_id == '100012043978':
+            buy_time = getTimeDurationDate(buy_time_init, -1.0)
+        else:
+            buy_time = getTimeDurationDate(buy_time_init, time_duration)
 
         print("预约时间:", reserve_time)
         print("抢购时间:%s fix:%s" % (buy_time_init, buy_time))
