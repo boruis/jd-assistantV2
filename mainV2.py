@@ -188,7 +188,7 @@ if __name__ == '__main__':
         buy_time_init = reserve_info.get("qiangStime")
         logger.info("buy_time:%s"%(buy_time_init))
         if sku_id == '100012043978':
-            buy_time = getTimeDurationDate(buy_time_init, -0.9003)
+            buy_time = getTimeDurationDate(buy_time_init, -0.9203)
         else:
             buy_time = getTimeDurationDate(buy_time_init, time_duration)
 
