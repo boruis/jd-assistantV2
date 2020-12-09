@@ -700,10 +700,19 @@ class Assistant(object):
 
     def get_item_info(self, sku_id):
         resp = self._get_item_detail_page(sku_id)
-        soup = BeautifulSoup(resp.text, "html.parser")
-        name = get_tag_value(soup.select("div.sku-name"))
-        price = self.get_item_price(sku_id)
-        return {'name':name,'price':price}
+        try:
+            soup = BeautifulSoup(resp.text, "html.parser")
+            name = get_tag_value(soup.select("div.sku-name"))
+            price = self.get_item_price(sku_id)
+            return {'name':name,'price':price}
+        except Exception as e:
+            logger.error("get_item_info:%s \n resp:%s",e,resp.text)
+            raise
+        else:
+            pass
+        finally:
+            pass
+        
     
     def print_item_info(self, sku_id):
         self.item_info = self.get_item_info(sku_id)
