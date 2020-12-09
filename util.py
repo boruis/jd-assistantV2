@@ -139,10 +139,10 @@ def get_tag_value(tag, key='', index=0):
         else:
             value = tag[index].text
         return value.strip(' \t\r\n')
-    except Exception as e:
+    except IndexError as e:
         # print("tag: %s \nexcept:%s"%(tag,e))
         logger.error("tag: %s \nexcept:%s"%(tag,e))
-        raise Exception
+        raise e
     
 
 

@@ -709,10 +709,7 @@ class Assistant(object):
             # print("get_item_info:%s \n resp:%s"%(e,resp.text))
             logger.error("get_item_info:%s \n resp:%s",e,resp.text)
             raise e
-        else:
-            pass
-        finally:
-            pass
+
         
     
     def print_item_info(self, sku_id):
