@@ -494,8 +494,9 @@ class Assistant(object):
         :return: 响应
         """
         url = 'https://item.jd.com/{}.html'.format(sku_id)
-        # logger.info("item_detai:%s"%(url))
-        page = requests.get(url=url, headers=self.headers)
+        logger.debug("item_detail:%s"%(url))
+        # page = requests.get(url=url, headers=self.headers)
+        page = self.sess.get(url=url, headers=self.headers,allow_redirects=False)
         logger.debug("page:%s"%(page.text[:150]))
         return page
 
