@@ -146,6 +146,7 @@ class Assistant(object):
             # validate_title = soup.title.string if soup.title is not None else None
             # name = get_tag_value(soup.select("div.sku-name"))
             if soup.title is not None:
+                logger.info("soup.title:%s"%(soup.title))
                 if resp.status_code == requests.codes.OK:
                     return True
             else:
