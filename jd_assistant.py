@@ -708,7 +708,7 @@ class Assistant(object):
             return {'name':name,'price':price}
         except Exception as e:
             # print("get_item_info:%s \n resp:%s"%(e,resp.text))
-            logger.error("get_item_info:%s \n resp:%s",e,resp.text)
+            logger.error("get_item_info:%s  resp:%s",e,resp.text)
             raise e
 
         
