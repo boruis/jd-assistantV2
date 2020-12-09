@@ -133,11 +133,16 @@ def parse_json(s):
 
 
 def get_tag_value(tag, key='', index=0):
-    if key:
-        value = tag[index].get(key)
-    else:
-        value = tag[index].text
-    return value.strip(' \t\r\n')
+    try:
+        if key:
+                value = tag[index].get(key)
+        else:
+            value = tag[index].text
+        return value.strip(' \t\r\n')
+    except Exception as e:
+        logger.error("tag: %s \nexcept:%s",tag,e)
+        raise e
+    
 
 
 def parse_items_dict(d):
