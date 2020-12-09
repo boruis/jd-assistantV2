@@ -706,8 +706,9 @@ class Assistant(object):
             price = self.get_item_price(sku_id)
             return {'name':name,'price':price}
         except Exception as e:
+            print("get_item_info:%s \n resp:%s",e,resp.text)
             logger.error("get_item_info:%s \n resp:%s",e,resp.text)
-            raise
+            raise Exception
         else:
             pass
         finally:
