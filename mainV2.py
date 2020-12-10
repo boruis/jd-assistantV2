@@ -214,6 +214,7 @@ if __name__ == '__main__':
                 sku_ids=sku_id, buy_time=buy_time, retry=retry, interval=loopinterval, num=1)
         else:
             logger.info("已过时:buy_time:%s now:%s"%(buy_time,datetime.datetime.now()))
+            
     elif model_type == '2':
         print("正常有货购买...")
         if not sku_id:

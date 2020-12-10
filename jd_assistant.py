@@ -15,6 +15,7 @@ from exception import AsstException
 from log import logger
 from messenger import Messenger
 from timer import Timer
+import threading
 from util import (
     DEFAULT_TIMEOUT,
     DEFAULT_USER_AGENT,
@@ -53,7 +54,7 @@ class Assistant(object):
         self.retry = global_config.get('item', 'retry')
         self.retryinterval = global_config.get('item', 'retryinterval')
         self.item_info = dict()
-
+        self.retry_time = 5
         if not self.eid or not self.fp or not self.track_id or not self.risk_control:
             raise AsstException('请在 config.ini 中配置 eid, fp, track_id, risk_control 参数，具体请参考 wiki-常见问题')
 
@@ -86,6 +87,7 @@ class Assistant(object):
         self.nick_name = ''
         self.is_login = False
         self.sess = requests.session()
+        # self.sess.keep_alive = False
         self.local_cookies = ''
         try:
             self._load_cookies()
@@ -709,7 +711,7 @@ class Assistant(object):
             return {'name':name,'price':price}
         except Exception as e:
             # print("get_item_info:%s \n resp:%s"%(e,resp.text))
-            logger.error("get_item_info:%s  resp:%s",e,resp.text)
+            logger.error("get_item_info:%s  resp:%s",e,resp.text[:150])
             raise e
 
         
@@ -1210,7 +1212,7 @@ class Assistant(object):
             'Host': 'itemko.jd.com',
             'Referer': 'https://item.jd.com/{}.html'.format(sku_id),
         }
-        retry_time = 10
+        retry_time = self.retry_time
         while True:
             resp = self.sess.get(url=url, headers=headers, params=payload)
             resp_json = parse_json(resp.text)
@@ -1293,7 +1295,7 @@ class Assistant(object):
             resp = self.sess.post(url=url, data=data, headers=headers)
             resp_json = parse_json(resp.text)
             if resp_json.get('addressList') and resp_json.get('token'):
-                logger.info("获取初始化信息成功: %s", sku_id)
+                logger.info("获取初始化信息成功: %s token:%s", sku_id,resp_json.get('token'))
                 return resp_json
             else:
                 logger.info("获取初始化信息失败: %s，0.5秒后重试", sku_id)
@@ -1372,7 +1374,7 @@ class Assistant(object):
             'Referer': 'https://marathon.jd.com/seckill/seckill.action?skuId={0}&num={1}&rid={2}'.format(
                 sku_id, num, int(time.time())),
         }
-        resp = self.sess.post(url=url, params=payload, data=self.seckill_order_data.get(sku_id), headers=headers)
+        resp = self.sess.post(url=url, params=payload, data=self.seckill_order_data.get(sku_id), headers=headers,timeout=self.timeout)
         resp_json = parse_json(resp.text)
         # 返回信息
         # 抢购失败：
@@ -1391,7 +1393,7 @@ class Assistant(object):
                 self.messenger.send(text='%s订单抢购成功' %(self.item_info.get('name')[:20]), desp='订单号：%s' % (order_id))
             return True
         else:
-            logger.info('抢购失败，返回信息: %s', resp_json)
+            logger.info('抢购失败，返回信息: %s order_data:%s', resp_json,self.seckill_order_data.get(sku_id))
             return False
 
     def exec_seckill(self, sku_id, retry=4, interval=4, num=1):
@@ -1448,6 +1450,59 @@ class Assistant(object):
             logger.info('开始抢购商品:%s', sku_id)
             self.exec_seckill(sku_id, retry, interval, num)
             logger.info('结束抢购商品:%s', sku_id)
+
+    def exec_seckill_by_time_threads(self, sku_ids, buy_time, retry=4, interval=4, num=1):
+        """定时抢购
+        :param sku_ids: 商品id，多个商品id用逗号进行分割，如"123,456,789"
+        :param buy_time: 下单时间，例如：'2018-09-28 22:45:50.000'
+        :param retry: 抢购重复执行次数，可选参数，默认4次
+        :param interval: 抢购执行间隔，可选参数，默认4秒
+        :param num: 购买数量，可选参数，默认1个
+        :return:
+        """
+        items_dict = parse_sku_id(sku_ids=sku_ids)
+        logger.info('准备抢购商品:%s', list(items_dict.keys()))
+        
+        t = Timer(buy_time=buy_time)
+        t.start()
+
+        threads = []
+        for sku_id in items_dict:
+            # for sku_id in items_dict:
+            #     logger.info('开始抢购商品:%s', sku_id)
+            #     self.exec_seckill(sku_id, retry, interval, num)
+            #     logger.info('结束抢购商品:%s', sku_id)
+            logger.info('开始抢购商品:%s', sku_id)
+            th = threading.Thread(target=self.exec_seckill, args=(sku_id, buy_time, retry, interval, num,))
+            # th = threading.Thread(target=exec_seckill_proc, args=(Assistant(), sku_id, buy_time, retry, interval, num,))
+            threads.append(th)
+            th.start()
+            logger.info('结束抢购商品:%s', sku_id)
+            '''
+                def exec_seckill_proc(cls, sku_id, buy_time, retry, interval, num):
+                """定时抢购线程
+                :param cls: Assistant实例
+                :param sku_id: 商品id
+                :param buy_time: 与商品id对应的抢购时间
+                :param retry: 抢购重复执行次数
+                :param interval: 抢购执行间隔
+                :param num: 购买数量
+                :return:
+            """
+
+            # 抢购定时
+            logger.info('准备抢购商品:%s', sku_id)
+            tb = Timer(buy_time)
+            tb.start()
+            cls.exec_seckill(sku_id, retry, interval, num)
+
+            '''
+
+        # for t in threads:
+        #     t.join()
+
+
+
 
     @check_login
     def exec_reserve_seckill_by_time(self, sku_id, buy_time, retry=4, interval=4, num=1):
