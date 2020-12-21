@@ -1393,7 +1393,8 @@ class Assistant(object):
                 self.messenger.send(text='%s订单抢购成功' %(self.item_info.get('name')[:20]), desp='订单号：%s' % (order_id))
             return True
         else:
-            logger.info('抢购失败，返回信息: %s order_data:%s', resp_json,self.seckill_order_data.get(sku_id))
+            # logger.info('抢购失败，返回信息: %s order_data:%s', resp_json,self.seckill_order_data.get(sku_id))
+            logger.info('抢购失败，返回信息: %s ', resp_json)
             return False
 
     def exec_seckill(self, sku_id, retry=4, interval=4, num=1):
