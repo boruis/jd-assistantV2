@@ -719,8 +719,8 @@ class Assistant(object):
     def print_item_info(self, sku_id):
         self.item_info = self.get_item_info(sku_id)
 
-        logger.info("商品名称:",self.item_info.get('name'))
-        logger.info("商品价格:",self.item_info.get('price'))
+        logger.info("商品名称:%s",self.item_info.get('name'))
+        logger.info("商品价格:%s",self.item_info.get('price'))
 
 
     @check_login

@@ -193,7 +193,7 @@ if __name__ == '__main__':
         #     buy_time = getTimeDurationDate(buy_time_init, time_duration)
         buy_time = getTimeDurationDate(buy_time_init, time_duration)
 
-        logger.info("预约时间:", reserve_time)
+        logger.info("预约时间:%s", reserve_time)
         logger.info("抢购时间:%s fix:%s" % (buy_time_init, buy_time))
         # 开始预约
         if reserve_time:
