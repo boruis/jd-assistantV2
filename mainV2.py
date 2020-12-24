@@ -193,8 +193,8 @@ if __name__ == '__main__':
         #     buy_time = getTimeDurationDate(buy_time_init, time_duration)
         buy_time = getTimeDurationDate(buy_time_init, time_duration)
 
-        print("预约时间:", reserve_time)
-        print("抢购时间:%s fix:%s" % (buy_time_init, buy_time))
+        logger.info("预约时间:", reserve_time)
+        logger.info("抢购时间:%s fix:%s" % (buy_time_init, buy_time))
         # 开始预约
         if reserve_time:
             asst.make_reserve(sku_id, reserve_time + '.000')
