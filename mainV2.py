@@ -187,10 +187,11 @@ if __name__ == '__main__':
         reserve_time = reserve_info.get("yueStime")
         buy_time_init = reserve_info.get("qiangStime")
         logger.info("buy_time:%s"%(buy_time_init))
-        if sku_id == '100012043978':
-            buy_time = getTimeDurationDate(buy_time_init, -0.9103)
-        else:
-            buy_time = getTimeDurationDate(buy_time_init, time_duration)
+        # if sku_id == '100012043978':
+        #     buy_time = getTimeDurationDate(buy_time_init, -0.9103)
+        # else:
+        #     buy_time = getTimeDurationDate(buy_time_init, time_duration)
+        buy_time = getTimeDurationDate(buy_time_init, time_duration)
 
         print("预约时间:", reserve_time)
         print("抢购时间:%s fix:%s" % (buy_time_init, buy_time))
