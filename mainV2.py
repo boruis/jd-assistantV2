@@ -94,7 +94,8 @@ def getSystemTimeduration():
     nettime2 = t_now - t0_s  # total url and system time
     nettime = r.elapsed.total_seconds()  # request total time
     time_duration = round(t - t_now, 4)  # remote time - local time
-    countNet = round(time_duration - nettime / 2, 4)
+    # countNet = round(time_duration - nettime / 2, 4)
+    countNet = round(time_duration - nettime , 4)
     logger.info("t0:%s t1:%s elapsed:%s nettime2:%0.4f" %
                 (t0, t1, nettime, nettime2))
     logger.info("jd:%s dT:%s diff:%s countNet:%0.4f " % (
