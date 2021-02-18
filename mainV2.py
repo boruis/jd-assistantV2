@@ -63,7 +63,8 @@ def getRemoteTimeDiff():
     # nettime2 =  
     nettime = HTTP_data_time
     time_duration = round(t - data_end,4)
-    countNet = round(time_duration - nettime / 2, 4)
+    # countNet = round(time_duration - nettime / 2, 4)
+    countNet = round(time_duration - nettime , 4)
 
     print('DNS time            = %.4f ms' % (DNS_time))
     print('HTTP handshake time = %.4f ms' % (HTTP_handshake_time))
