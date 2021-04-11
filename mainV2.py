@@ -117,7 +117,7 @@ def getSystemTimeduration():
 
 #getRemoteTimeDiff()
 #time_duration = getSystemTimeduration()
-time_duration = 0
+time_duration = 0.0001
 
 
 dt = time.time()
