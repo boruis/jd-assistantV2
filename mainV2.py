@@ -77,7 +77,7 @@ def getRemoteTimeDiff():
 def getSystemTimeduration():
     # get server time
 
-    url = 'https://a.jd.com//ajax/queryServerData.html'
+    url = 'https://a.jd.com/ajax/queryServerData.html'
     session = requests.session()
     t0_s = time.time()  # local host time
     r = session.get(url)
@@ -115,8 +115,8 @@ def getSystemTimeduration():
     '''
 
 
-#getRemoteTimeDiff()
-#time_duration = getSystemTimeduration()
+# getRemoteTimeDiff()
+# ime_duration = getSystemTimeduration()
 time_duration = 0.0001
 
 
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     asst = Assistant()  # 初始化
 
     if not asst.sku_id:
-        sku_id = '100012043978'  # (飞天)
+        sku_id = '100008738203'
     else:
         sku_id = asst.sku_id
     # sku_id = '100001324422'   #(Test)
