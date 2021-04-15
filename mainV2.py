@@ -189,6 +189,7 @@ if __name__ == '__main__':
         reserve_info = asst.get_reserve_info(sku_id)
         reserve_time = reserve_info.get("yueStime")
         buy_time_init = reserve_info.get("qiangStime")
+        buy_time_end = reserve_info.get("qiangEtime")
         logger.info("buy_time:%s"%(buy_time_init))
         # if sku_id == '100012043978':
         #     buy_time = getTimeDurationDate(buy_time_init, -0.9103)
@@ -217,8 +218,8 @@ if __name__ == '__main__':
             asst.exec_seckill_by_time(
                 sku_ids=sku_id, buy_time=buy_time, retry=retry, interval=loopinterval, num=1)
         else:
-            logger.info("已过时:buy_time:%s now:%s"%(buy_time,datetime.datetime.now()))
-            
+            # 直接购买
+            asst.buy_item_in_stock(sku_ids=sku_id, area=area, wait_all=False, stock_interval=5)            
     elif model_type == '2':
         print("正常有货购买...")
         if not sku_id:

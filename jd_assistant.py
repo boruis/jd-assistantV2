@@ -1009,13 +1009,12 @@ class Assistant(object):
         data = {
             'overseaPurchaseCookies': '',
             'vendorRemarks': '[]',
-            'submitOrderParam.sopNotPutInvoice': 'false',
+            'submitOrderParam.sopNotPutInvoice': 'true',
             'submitOrderParam.trackID': 'TestTrackId',
             'submitOrderParam.ignorePriceChange': '0',
             'submitOrderParam.btSupport': '0',
-            'riskControl': self.risk_control,
-            'submitOrderParam.isBestCoupon': 1,
             'submitOrderParam.jxj': 1,
+            'presaleStockSign':1,
             'submitOrderParam.trackId': self.track_id,  # Todo: need to get trackId
             'submitOrderParam.eid': self.eid,
             'submitOrderParam.fp': self.fp,
